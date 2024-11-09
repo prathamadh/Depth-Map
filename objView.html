@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>3D Model Viewer with Controls</title>
+  <style>
+    body {
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      font-family: Arial, sans-serif;
+    }
+    #text {
+      margin-top: 20px;
+      font-size: 20px;
+    }
+    #container {
+      width: 80vw;  /* Adjust the width for a smaller window */
+      height: 60vh; /* Adjust the height for a smaller window */
+      border: 2px solid #ccc;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+<div id="text">Here is the obj</div>
+<div id="container"></div>
+
+<!-- Three.js CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<!-- OBJLoader, MTLLoader, and OrbitControls -->
+<script src="https://cdn.jsdelivr.net/npm/three@0.128/examples/js/loaders/OBJLoader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128/examples/js/loaders/MTLLoader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128/examples/js/controls/OrbitControls.js"></script>
+
+<script>
+  // Basic scene setup
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+  const renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setSize(window.innerWidth * 0.8, window.innerHeight * 0.6); // Adjust renderer size
+  document.getElementById('container').appendChild(renderer.domElement);
+
+  // Lighting
+  const light = new THREE.DirectionalLight(0xffffff, 1);
+  light.position.set(2, 2, 5).normalize();
+  scene.add(light);
+
+  // OrbitControls for interaction
+  const controls = new THREE.OrbitControls(camera, renderer.domElement);
+  controls.enableDamping = true;   // Adds smooth movement
+  controls.dampingFactor = 0.1;
+  controls.enableZoom = true;      // Allows zooming in/out
+  controls.target.set(0, 0, 0);    // Set the target of controls to the model's center
+
+  // Load .obj model from a URL (with optional .mtl material file)
+  const objLoader = new THREE.OBJLoader();
+  const mtlLoader = new THREE.MTLLoader();
+
+  const modelURL = 'https://raw.githubusercontent.com/Kingyakstha/3dObj/main/cottage_obj.obj';
+  const materialURL = 'https://raw.githubusercontent.com/Kingyakstha/3dObj/main/cottage_obj.mtl';
+
+  // Load materials first, then load the .obj file
+  mtlLoader.load(materialURL, (materials) => {
+    materials.preload();
+    objLoader.setMaterials(materials);
+
+    objLoader.load(
+      modelURL,
+      (obj) => {
+        obj.position.set(0, -1, 0); // Adjust position if needed
+        scene.add(obj);
+        camera.position.z = 5;
+        controls.update(); // Update the controls target after adding the object
+        animate();
+      },
+      (xhr) => {
+        console.log((xhr.loaded / xhr.total) * 100 + '% loaded');
+      },
+      (error) => {
+        console.error('An error happened', error);
+      }
+    );
+  });
+
+  // Animation loop
+  function animate() {
+    requestAnimationFrame(animate);
+    controls.update(); // Update controls each frame
+    renderer.render(scene, camera);
+  }
+
+  // Resize handling
+  window.addEventListener('resize', () => {
+    renderer.setSize(window.innerWidth * 0.8, window.innerHeight * 0.6); // Adjust size on resize
+    camera.aspect = (window.innerWidth * 0.8) / (window.innerHeight * 0.6);
+    camera.updateProjectionMatrix();
+  });
+</script>
+</body>
+</html>
