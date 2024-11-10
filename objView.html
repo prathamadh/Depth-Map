@@ -63,6 +63,8 @@
   const modelURL = 'https://raw.githubusercontent.com/Kingyakstha/3dObj/main/cottage_obj.obj';
   const materialURL = 'https://raw.githubusercontent.com/Kingyakstha/3dObj/main/cottage_obj.mtl';
 
+  let loadedModel;
+
   // Load materials first, then load the .obj file
   mtlLoader.load(materialURL, (materials) => {
     materials.preload();
@@ -72,7 +74,9 @@
       modelURL,
       (obj) => {
         obj.position.set(0, -1, 0); // Adjust position if needed
+        obj.scale.set(0.1, 0.1, 0.1);
         scene.add(obj);
+        loadedModel = obj; // Store the model reference
         camera.position.z = 5;
         controls.update(); // Update the controls target after adding the object
         animate();
@@ -89,6 +93,12 @@
   // Animation loop
   function animate() {
     requestAnimationFrame(animate);
+
+    // Rotate the model if it has loaded
+    if (loadedModel) {
+      loadedModel.rotation.y += (Math.PI / 2) / 120; // 1 rotation in 4 seconds (1/120 rotation per frame at 60fps)
+    }
+
     controls.update(); // Update controls each frame
     renderer.render(scene, camera);
   }
