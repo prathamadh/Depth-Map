@@ -1,0 +1,418 @@
+Depth estimation has long been a critical aspect of computer vision, providing essen
+tial information for understanding and interacting with three-dimensional environments.
+ Traditional approaches to depth estimation often rely on TOF systems or active sensors
+ like LIDAR.A TOFsensor measures the time it takes for a light signal to travel to an ob
+ject and back to determine the object’s distance. It emits a light pulse (usually infrared)
+ and calculates the distance based on the travel time of the reflected signal. LIDAR, on
+ the other hand, employs laser pulses to measure the time it takes for the light to travel
+ to an object and back, providing precise distance measurements. While effective, these
+ systems have notable limitations in terms of cost, size, power consumption, and com
+plexity, making them less suitable for many applications. Recent advances in machine
+ learning and computer vision have significantly enhanced the capacity of monocular
+ depth estimation. CNNs and other deep learning models have been trained on large
+ datasets to predict depth maps from single images with remarkable accuracy. These
+ models leverage large amounts of labeled data to learn the intricate patterns and cues
+ that signify depth, making it possible to generate dense and accurate depth maps from
+ RGBimages.
+ 1.2 Problem Statement
+ Accurate depth estimation is a fundamental requirement for a wide range of applications
+ in computer vision and robotics. Traditional depth estimation methods predominantly
+ rely on TOF or LIDAR sensors, which provide reliable depth measurements but come
+ with significant drawbacks including high cost, substantial power consumption, and
+ increased system complexity. Depth estimation, which infers depth from RGB image,
+ presents a more accessible and cost-effective alternative. The approach must infer from
+ visual cues such as texture, shading, perspective, and motion, which can be ambiguous
+ 1
+and complex to interpret.
+ 1.3 Objectives
+ The objectives of this project is:
+ • To design and develop an accurate depth estimation system using RGB images.
+ 1.4 Application
+ The major application of the project are:
+ • Enhances the ability of robots to understand and navigate human environments
+ safely and effectively.
+ • Allows systems to detect and avoid obstacles in real-time, preventing collisions
+ and enhancing navigation.
+ • Provides accurate 3D maps of the environment, crucial for navigation and situa
+tional awareness.
+ • Improved depth perception in AR/VR system and Realistic object interaction and
+ manipulation and enhances immersive experiences by providing accurate spatial
+ information and enabling precise tracking of virtual objects.
+ • Enables vehicles to accurately perceive and navigate their surroundings, improv
+ing safety and efficiency.
+ • For 3D reconstructions and modeling, it facilitates the creation of detailed and
+ accurate 3D models for various applications.
+ • Enhancesmedical imaging bysurgical planning, navigation and diagnosis by pro
+viding detailed 3D views of anatomical structures, aiding in precise surgical plan
+ning and diagnosis.
+ • Enables the creation of customized and well-fitted prosthetic and orthotic devices
+ through accurate 3D modeling.
+ 2
+• Enhances the realism and interactivity of games by providing accurate depth in
+formation for virtual environments.
+ • In photography and cinematography, depth maps can improve the quality of im
+ages and videos by enabling advanced effects and accurate focus.
+ • Security and surveillance with enhanced facial recognition and biometrics
+ • Enhances the efficiency and precision of automated systems in manufacturing,
+ industrial automation and other industrial applications.
+ • In telepresence and teleconferencing, it can provide a more immersive and inter
+active experience by accurately capturing and rendering 3D environments.
+ • Assists in creating accurate 3D reconstructions of crime scenes, aiding in investi
+gations and analysis.
+ 3
+CHAPTER2
+ LITERATUREREVIEW
+ The quest for the estimation of depth from image has captivated researchers and sci
+entists for ages.Traditional depth estimation methods of image-based depth were shape
+ from shading [1], though not monocular, laid the foundation for recovering depth cues
+ from image shading variation. Other methods like Structure from motion [2], pho
+togrammetry, Shape from texture[3], based on binocular camera through stereo match
+ing and triangulation to obtain a depth map.
+ After the advancement of Deep neural networks, multiple papers has been published
+ about using Deep learning as a tool for depth estimation from RGB images. The
+ paper[4] proposed depth estimation from a single 2D color image through a deep neu
+ral network. It employed two deep network stacks: one that makes a coarse global
+ prediction based on the entire image, and another that refines this prediction locally.
+ In this paper[5] they introduce an approach of binocular depth estimation method based
+ on deep learning. A new convolutional neural network is designed, which consists of
+ two sub-networks. The first sub-network is a deep network with Siamese branches
+ and 3D convolutional layer, it learns parallax and global information and generates a
+ global depth estimation result in low resolution. The second is a fully convolutional
+ deep network, which reconstructions the depth map to original resolution. The two
+ sub-networks are connected by a pool pyramid.
+ The paper[6] proposes the use of deep architecture called NRF which combines CNNs
+ with Regression Forest. It achieves robustness by processing a data sample with CRT an
+ ensemble of binary regression trees with CNNs at every node. CNNs at every node of
+ CRT have significantly fewer parameters. For each CNN in the split node, it uses only
+ the RGB input window instead of convolutional outputs from the parent split node; the
+ size of input windows for the split nodes is gradually reduced as we go down the tree
+ along its depth. It does not back-propagate the loss of depth prediction bottom-up rather,
+ compute a distinct loss for every CNN in the tree, and then use these losses for parallel
+ training of all CNNs in the tree. With the consideration of neighboring information, it
+ 4
+results in smoother depth maps.
+ This paper[7] proposes a novel training objective that enables our convolutional neu
+ral network to learn to perform single image depth estimation, despite the absence of
+ ground truth depth data. The model uses bilinear sampling to generate images, resulting
+ in a fully (sub-)differentiable training loss. A fully convolutional deep neural network,
+ by posing monocular depth estimation as an image reconstruction problem, can solve
+ the disparity field without requiring ground truth depth. It includes a left-right consis
+tency check to improve the quality of synthesized depth images.
+ This paper[8] proposes use of synthetic data to train the model for handling adverse
+ weather conditions like rain and night using a method called md4all. Md4all utilize ex
+isting successful depth estimation methods for ideal conditions. First, it generates com
+plex samples corresponding to normal training ones. They trained the model by guiding
+ itself or full-supervision by feeding the generated samples and computing the standard
+ losses on the corresponding original images. Doing so enables a single model to re
+cover information across diverse conditions without modifications at inference time.
+ Their approach was general and not bound to specific architecture
+ This paper [9] proposes a SID strategy to discretize depth and recast depth network
+ learning as an ordinal regression problem. By training the network using an ordinary
+ regression loss, it achieves much higher accuracy and faster convergence. It adopts a
+ multi-scale network structure which avoids unnecessary spatial pooling and captures
+ multi-scale information in parallel. Proposed DORN achieves state-of-the-art results
+ on three challenging benchmark and outperforms existing methods by large margin
+ This survey paper [10] reviews five papers that attempt to solve the depth estimation
+ problem with various techniques including supervised, weakly-supervised, and unsu
+pervised learning techniques. It compare these papers and understand the improvements
+ made over one another. Explores the potential improvements that can aid to better solve
+ this problem. Different papers are: Depth Map Prediction from a Single Image us
+ing a Multi-Scale Deep Network[4], it uses multiscale information and also introduced
+ the concept of directly regressing over pixels for depth estimation. They use a special
+ scale-invariant loss to account for scale-dependent error. Multi-Scale Continuous CRFs
+ as Sequential Deep Networks for monocular depth estimation[11], A novel approach for
+ 5
+predicting depth maps from RGB inputs which exploit multi-scale estimations derived
+ from CNN inner layers by fusing them within a CRF framework Structured Attention
+ Guided Convolutional Neural Fields for monocular depth estimation[12]Similar frame
+work, using CNN and feeding extracted multi-scale information into a continuous CRF
+ model. Themajoraddition enforcement of similarity constraints and usage of structured
+ attention model which can automatically regulate amount of information transferred be
+tween corresponding features at different scales. Deep Ordinal Regression Network for
+ monocular depth estimation[9], Unsupervised monocular depth estimation with Left
+Right Consistency[7]
+ This paper[13] proposes a simple model with minimum reprojection loss, designed to
+ robustly handle occlusions, a full-resolution multi-scale sampling method that reduces
+ visual artifacts and an auto-masking loss to ignore training pixels that violate camera
+ motion assumptions.
+ This paper[14] proposes an efficient and lightweight encoder-decoder network architec
+ture and apply network pruning to further reduce computational complexity and latency.
+ It demonstrates that it is possible to achieve similar accuracy as prior work on depth es
+timation, but at inference speeds that are an order of magnitude faster. State-of-the-art
+ single-view depth estimation algorithms are based on complex deep neural networks
+ that are too slow for real-time inference on an embedded platform, so it was introduced
+ to address the problem of fast depth estimation on embedded systems.
+ Structured light is widely used in the field of depth estimation and shape reconstruction
+ techniques. In this paper[15], they actively utilized motion blur, which they refer to as
+ a light flow, to estimate depth. Analysis reveals that minimum two light flows, which
+ are retrieved from two projected patterns on the object, are required for depth estima
+tion. To retrieve two light flows at the same time, two sets of parallel line patterns are
+ illuminated from two video projectors and the size of motion blur of each line is pre
+cisely measured. By analyzing the light flows, i.e. lengths of the blurs, scene depth
+ information is estimated.
+ 6
+CHAPTER3
+ RELATEDTHEORY
+ 3.1 Hardware
+ The Arduino Nano is a small, breadboard-friendly microcontroller board based on the
+ ATmega328. It is equipped with 30 male I/O headers which can be programmed us
+ing the Arduino Software IDE. It can communicate with a computer and other micro
+controllers.It consists of flash memory of 32KB capacity, of which 2 KB is used for
+ Bootloader.It supports I2C, SPI and UART.
+ 3.1.1 Raspberry Pi 4 Model B
+ The Raspberry Pi is a credit card-sized single-board computer that provides a powerful
+ processing platform in a compact form factor. It is equipped with a range of input/output
+ interfaces, including USB ports, HDMI, Ethernet, GPIO, and a camera interface. The
+ processor speed of Raspberry Pi 4 Model B is 1.5 GHz. It comes with onboard wireless
+ networking and Bluetooth .
+ 3.1.2 Motor driver
+ The L293 and L293D are integrated circuits that can be used to control a variety of
+ motors, including DC motors, stepper motors, and solenoids. They can provide up to
+ 1 amp of current per channel, and they are designed to operate with a wide range of
+ supply voltages (from 4.5 volts to 36 volts). The L293D is a lower-current version of
+ the L293, but it is still capable of providing up to 600 mA of current per channel. Both
+ devices have built-in electrostatic discharge protection and high-noise-immunity inputs,
+ which makes them resistant to damage from electrical spikes and noise. They also have
+ output clamp diodes, which help to suppress inductive transients. The L293 and L293D
+ are designed for use in a variety of applications, including robotics, automation, and
+ automotive systems.
+ 7
+3.1.3 Motor
+ Motors also known as actuators are fundamental components in robotics, providing
+ the necessary actuation, precision, and control for robot movement and manipulation.
+ With the help of motors, the system can be moved to different locations using a precise
+ control system.
+ 3.2 Software
+ 3.2.1 PyTorch
+ PyTorch is an open source machine learning framework based on the Python program
+ming language and the Torch library. Torch is an open source machine learning library
+ used for creating deep neural networks and is written in the Lua scripting language. It’s
+ one of the preferred platforms for deep learning research. The framework is built to
+ speed up the process between research prototyping and deployment.
+ 3.2.2 Flask
+ Flask is a lightweight and easy-to-use micro web framework for Python, designed to fa
+cilitate quick web development while being flexible enough for complex applications.
+ As a micro framework, Flask provides the essential tools needed to build web applica
+tions without mandating specific libraries or components, focusing on simplicity and
+ ease of use. Its flexibility allows developers to choose and integrate various libraries
+ and tools, making it highly customizable. Key features of Flask include a built-in de
+velopment server and debugger, which streamline testing and debugging processes. It
+ uses Jinja2 as its templating engine, enabling the creation of dynamic HTML pages
+ with powerful features. Flask’s intuitive URL routing system maps URLs to Python
+ functions, simplifying endpoint management. [16]
+ 3.2.3 React
+ React is a popular JavaScript library developed by Facebook for building user inter
+faces, particularly single-page applications. It allows developers to create large web
+ 8
+applications that can update and render efficiently in response to data changes. React is
+ component-based, meaning the UI is divided into reusable components, each managing
+ its own state and rendering logic. This modular approach promotes code reusability and
+ easier maintenance.
+ 3.3 Visual Cues
+ 3.3.1
+ Stereo Vision (Binocular Disparity)
+ Using two images captured from slightly different viewpoints (like human eyes), depth
+ can be estimated by calculating the disparity between corresponding points in the two
+ images. Disparity refers to the difference in the relative position of an object in the two
+ images, which is inversely proportional to the object’s distance [17] .
+ 3.3.2
+ Motion Parallax
+ Motion parallax is the optical change of the visual field of an observer which results
+ from a change of the observer’s viewing position [18]. When an observer or the camera
+ moves, nearby objects appear to move faster across the field of view than distant objects.
+ This relative motion provides cues about the depth and distance of objects [19].
+ 3.3.3 Structured Light
+ Structured lighting for depth estimation involves projecting a known pattern (like grids
+ or stripes) onto a scene. The pattern’s deformation when viewed from a different angle
+ is analyzed to determine the depth and shape of objects.Thus, structured lighting tech
+nique is based on projecting a light pattern and viewing the illuminated scene from one
+ or more points of view. By comparing the projected and observed patterns, a depth map
+ is generated [20]. This technique is widely used in 3D scanning, robotics, and computer
+ vision for accurate and detailed depth measurements.
+ 9
+3.3.4 Active Illumination
+ Active illumination for depth estimation involves projecting light, such as laser or in
+frared, onto a scene and measuring the reflected light to determine depth [21]. This
+ method provides precise depth information and is commonly used in applications like
+ autonomous vehicles, 3D mapping, and augmented reality.
+ 3.3.5
+ Texture Gradient
+ Thedensity of texture patterns changes with distance, textures appear denser and smaller
+ as they get further away. This gradient helps infer the relative depth of surfaces and ob
+jects in the image.
+ 3.3.6 Occlusion (Interposition)
+ When one object overlaps or covers another, the occluded object is perceived to be
+ farther away. This cue provides relative depth information between overlapping objects.
+ Shading and Shadows:
+ Variations in light and shadow on objects provide information about their shape and
+ depth. The position and length of shadows also help in estimating the spatial relation
+ship and distance of objects.
+ 3.3.7 Aerial Perspective (Atmospheric Perspective)
+ Distant objects often appear hazier and less distinct due to atmospheric scattering of
+ light. This effect can be used to gauge the depth of objects based on their clarity and
+ color saturation.
+ 3.3.8 Relative Size
+ Whenthe size of familiar objects is known, their relative sizes in the image can be used
+ to infer their distances. Larger objects are perceived as closer, while smaller ones are
+ seen as farther away.
+ 10
+3.3.9
+ Known Object Size (Size Constancy)
+ Using the actual size of known objects to infer depth. If an object appears smaller than
+ its known size, it is inferred to be further away.
+ 3.3.10 Linear Perspective
+ Parallel lines appear to converge as they recede into the distance, meeting at a vanishing
+ point. This convergence provides cues about the depth and distance of objects along
+ those lines.
+ 3.3.11 Defocus Blur (Depth from Defocus)
+ Objects at different distances from the camera have different amounts of blur due to the
+ depth of field effect. The amount of defocus blur can be used to estimate the distance
+ of objects from the camera.
+ 11
+CHAPTER4
+ METHODOLOGY
+ The project follows an Iterative Development Process, allowing for continuous refine
+ment and adaptation based on learning from each phase of the project. Different statis
+tical and mathematical tools are used to establish clear decision points throughout the
+ project lifecycle and define key artifacts (both input and output) to guide the project’s
+ progression and ensure alignment with project goals.
+ 4.1 System Design
+ 4.1.1 Hardware design
+ Figure 4.1: Hardware block diagram
+ The project uses a Raspberry Pi as the brain.Visual Cue generator generates cues that
+ help in understanding how far away objects are. An Arduino Uno microcontroller steps
+ 12
+in to control the Visual cue generator, and motor driver, which in turn powers a mo
+tor.The Raspberry Pi processes images captured by camera and sends them to the back
+end through Wi-Fi for visualization.
+ 4.1.2 Software design
+ Figure 4.2: Software block diagram
+ The software for this project tackles the video feed from the camera and turns it into
+ a depth map showing how far away things are. First, the program cleans up the video,
+ getting rid of any noise. If multiple pictures are needed, the software align them up per
+fectly. Then the model figures out depth from the video.This might involve comparing
+ slightly different pictures. Once it has depth information, the program combines it back
+ with the original color picture to create a special image with both color and depth data.
+ There might be some extra steps to fine-tune the picture and account for the camera’s
+ quirks.
+ 4.2 Model Training Pipelines
+ 4.2.1 Supervised learning
+ Theinput image is transformed into tokens either by extracting non-overlapping patches
+ followed by a linear projection of their flattened representation or by applying a ResNet
+50 feature extractor. The image embedding is augmented with a positional embedding
+ and a patch-independent readout token is added. The tokens are passed through multi
+ple transformer stages. We reassemble tokens from different stages into an image-like
+ representation at multiple resolutions. Fusion modules progressively fuse and upsam
+ple the representations to generate a fine-grained prediction. Center: Overview of the
+ Reassembles operation. Tokens are assembled into feature maps with 1 s the spatial
+ 13
+Figure 4.3: Supervised learning of DPT transformer [22]
+ resolution of the input image. Right: Fusion blocks combine features using residual
+ convolutional units and upsample the feature maps.[22]
+ 4.2.2 Multiscale learning
+ Figure 4.4: Multiscale learning [? ]
+ The described method involves a global, coarse-scale network with five convolution
+ and max-pooling layers, followed by two fully connected layers for feature extraction.
+ Input images are downsampled by a factor of 2, and the final output is at 1/4-resolution
+ of this downsampled input. This output corresponds to a center crop, retaining most of
+ the input image while losing a small border area due to the initial layer of the fine-scale
+ network and image transformations.
+ 14
+CHAPTER5
+ WORKACCOMPLISHED
+ 5.1 Exploratory Data Analysis
+ In the initial phase of our project, we focused on performing Exploratory Data Analysis
+ (EDA) on various publicly available datasets for monocular RGB image depth estima
+tion. The purpose of this analysis was to gain a deeper understanding of the datasets,
+ including their characteristics, quality, and relevance to the task. Key steps in the EDA
+ process included:
+ • Dataset Evaluation: We examined multiple datasets, focusing on aspects such as
+ resolution, diversity, and annotation accuracy.
+ • Data Distribution Analysis: We studied the depth distribution, identifying trends,
+ anomalies, and outliers that could impact model performance.
+ • Visualization: Various visualization techniques were employed to inspect the
+ image-depth correlations and validate the dataset’s suitability for our objectives.
+ Figure 5.1: Images of object captured under different lighting condition
+ 5.2 Architecture
+ During the development process, several architectures were evaluated to determine the
+ most effective design for generating accurate PBR maps. Among these, two architec
+tures stood out for their performance and scalability:
+ 15
+5.2.1 ConvNeXt Encoder with Hourglass Decoder
+ Overview: This architecture utilizes the ConvNeXt encoder, a convolutional neural net
+work backbone renowned for its efficiency and capability in feature extraction, in com
+bination with an hourglass decoder. The hourglass decoder is particularly suited for
+ tasks requiring detailed spatial understanding, such as image-to-image translation and
+ PBRmapgeneration.
+ Strengths:
+ • High spatial resolution in the output due to the symmetric structure of the hour
+glass decoder.
+ • Effective handling of hierarchical feature extraction from images.
+ Challenges:
+ • Inconsistent performance on more complex map types, such as metallic and am
+bient occlusion.
+ • Computationally more expensive when scaling to larger datasets or higher reso
+lutions.
+ 5.2.2 DINOv2 Encoder with RAFTDepthNormalDPT5 Decoder
+ Overview: Thisarchitecture combines the DINOv2encoder, atransformer-based model
+ known for its ability to capture global and contextual features, with the RAFTDepth
+NormalDPT5 decoder [23], which is specifically optimized for generating depth and
+ normal maps.
+ Strengths:
+ • Superiorperformanceingenerating depth and normalmapsduetoitstransformer
+based design and attention mechanisms.
+ • Better generalization across diverse datasets, making it ideal for handling varied
+ features in PBR maps.
+ 16
+• Scalable and robust for transfer learning tasks.
+ Challenges:
+ • Highcomputational resource requirements during training due to the transformer
+heavy architecture.
+ • Further optimization needed for roughness, metallic, and ambient occlusion maps
+ to fully leverage the encoder’s capabilities.
+ 5.2.3 Rationale for Selection
+ Whilebotharchitectures demonstrated significant strengths, the DINOv2 + RAFTDepth
+NormalDPT5 configuration was selected as the primary model for the following rea
+sons:
+ • Its ability to capture global contextual information results in more accurate and
+ consistent map generation.
+ • The flexibility of the architecture facilitates better integration with transfer learn
+ing techniques.
+ • Preliminary results indicate superior performance on complex datasets and a wider
+ range of map types.
+ By focusing on refining this architecture and addressing its current limitations, the
+ project aims to achieve highly accurate and efficient PBR map generation.
+ 5.3 Image Analysis and Processing
+ After completing the EDA and choosing the best architecture, we proceeded to image
+ analysis and processing to enhance the data and extract features that contribute to accu
+rate depth estimation. During this phase, we explored several techniques, and Wavelet
+ Analysis and FFT (Fast Fourier Transform) Analysis emerged as the most effective
+ methods for our application.
+ 17
+• Wavelet Analysis
+ Wavelet analysis involves breaking an image into smaller components, called
+ wavelets, which are localized in both time (or space) and frequency. This method
+ allows us to analyze an image at multiple scales and resolutions. Wavelets are
+ particularly useful for capturing fine details, such as edges and textures. By de
+composing an image into wavelet coefficients, we were able to highlight impor
+tant features while reducing noise.
+ • FFTAnalysis
+ FFT (Fast Fourier Transform) analysis converts the spatial representation of an
+ image into its frequency components. This technique helps identify patterns and
+ repetitive structures in the image by analyzing its frequency spectrum. High
+frequency components correspond to fine details, while low-frequency compo
+nents capture the broader structures. FFT analysis enabled us to emphasize es
+sential features in the image while suppressing irrelevant information, further im
+proving the depth estimation process. These techniques provided valuable in
+sights and improvements in our preprocessing pipeline, contributing to the ro
+bustness of our depth estimation approach
+ • Local Binary Pattern (LBP) Transform
+ The Local Binary Pattern (LBP) transform is a widely used method for texture
+ analysis and feature extraction in image processing. It is simple, computationally
+ efficient, and highly effective for capturing local texture information. The LBP
+ transform works by comparing the intensity of a central pixel in a local neighbor
+hood with its surrounding pixels. For each surrounding pixel:– Ifthe intensity of the neighboring pixel is greater than or equal to the central
+ pixel, it is assigned a value of 1.– Otherwise, it is assigned a value of 0.
+ These binary values form a binary pattern (usually an 8-bit binary number for a
+ 3 ×3 neighborhood), which is then converted into a decimal value to represent
+ the texture feature
